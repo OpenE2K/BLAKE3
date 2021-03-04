@@ -126,6 +126,25 @@ static
     }
     g_cpu_features = features;
     return features;
+#elif defined(IS_E2K)
+    enum cpu_feature features = 0;
+#if __SSE2__
+    features |= SSE2;
+#endif
+#if __SSSE3__
+    features |= SSSE3;
+#endif
+#if __SSE4_1__
+    features |= SSE41;
+#endif
+#if __AVX__
+    features |= AVX;
+#endif
+#if __AVX2__
+    features |= AVX2;
+#endif
+    g_cpu_features = features;
+    return features;
 #else
     /* How to detect NEON? */
     return 0;
@@ -137,7 +156,7 @@ void blake3_compress_in_place(uint32_t cv[8],
                               const uint8_t block[BLAKE3_BLOCK_LEN],
                               uint8_t block_len, uint64_t counter,
                               uint8_t flags) {
-#if defined(IS_X86)
+#if defined(IS_X86) || defined(IS_E2K)
   const enum cpu_feature features = get_cpu_features();
   MAYBE_UNUSED(features);
 #if !defined(BLAKE3_NO_AVX512)
@@ -166,7 +185,7 @@ void blake3_compress_xof(const uint32_t cv[8],
                          const uint8_t block[BLAKE3_BLOCK_LEN],
                          uint8_t block_len, uint64_t counter, uint8_t flags,
                          uint8_t out[64]) {
-#if defined(IS_X86)
+#if defined(IS_X86) || defined(IS_E2K)
   const enum cpu_feature features = get_cpu_features();
   MAYBE_UNUSED(features);
 #if !defined(BLAKE3_NO_AVX512)
@@ -195,7 +214,7 @@ void blake3_hash_many(const uint8_t *const *inputs, size_t num_inputs,
                       size_t blocks, const uint32_t key[8], uint64_t counter,
                       bool increment_counter, uint8_t flags,
                       uint8_t flags_start, uint8_t flags_end, uint8_t *out) {
-#if defined(IS_X86)
+#if defined(IS_X86) || defined(IS_E2K)
   const enum cpu_feature features = get_cpu_features();
   MAYBE_UNUSED(features);
 #if !defined(BLAKE3_NO_AVX512)
@@ -245,7 +264,7 @@ void blake3_hash_many(const uint8_t *const *inputs, size_t num_inputs,
 
 // The dynamically detected SIMD degree of the current platform.
 size_t blake3_simd_degree(void) {
-#if defined(IS_X86)
+#if defined(IS_X86) || defined(IS_E2K)
   const enum cpu_feature features = get_cpu_features();
   MAYBE_UNUSED(features);
 #if !defined(BLAKE3_NO_AVX512)

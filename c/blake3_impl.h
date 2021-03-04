@@ -38,6 +38,10 @@ enum blake3_flags {
 #define IS_X86_32
 #endif
 
+#if defined(__e2k__)
+#define IS_E2K
+#endif
+
 #if defined(IS_X86)
 #if defined(_MSC_VER)
 #include <intrin.h>
@@ -45,7 +49,7 @@ enum blake3_flags {
 #include <immintrin.h>
 #endif
 
-#if defined(IS_X86)
+#if defined(IS_X86) || defined(IS_E2K)
 #define MAX_SIMD_DEGREE 16
 #elif defined(BLAKE3_USE_NEON)
 #define MAX_SIMD_DEGREE 4
@@ -200,7 +204,7 @@ void blake3_hash_many_portable(const uint8_t *const *inputs, size_t num_inputs,
                                uint8_t flags, uint8_t flags_start,
                                uint8_t flags_end, uint8_t *out);
 
-#if defined(IS_X86)
+#if defined(IS_X86) || defined(IS_E2K)
 #if !defined(BLAKE3_NO_SSE2)
 void blake3_compress_in_place_sse2(uint32_t cv[8],
                                    const uint8_t block[BLAKE3_BLOCK_LEN],
