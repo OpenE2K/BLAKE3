@@ -60,7 +60,7 @@ blake3_avx512.o: blake3_avx512.c
 blake3_neon.o: blake3_neon.c
 	$(CC) $(CFLAGS) $(EXTRAFLAGS) -c $^ -o $@
 
-test: CFLAGS += -DBLAKE3_TESTING -fsanitize=address,undefined
+test: CFLAGS += -DBLAKE3_TESTING # -fsanitize=address,undefined
 test: all
 	./test.py
 
